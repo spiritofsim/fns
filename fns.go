@@ -1,6 +1,7 @@
 package fns
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -69,6 +70,38 @@ func ParseQrStr(str string) (fn string, opType, fd, fpd int, date time.Time, sum
 	}
 
 	return
+}
+
+func Register(ctx context.Context, email, name, phone string) error {
+	body, err := json.Marshal(struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
+		Phone string `json:"phone"`
+	}{
+		Email: email, Name: name, Phone: phone,
+	})
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://proverkacheka.nalog.ru:9999/v1/mobile/users/signup", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Content-Type", "application/json; charset=UTF-8")
+
+	resp, err := (&http.Client{}).Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected code %v", resp.StatusCode)
+	}
+
+	return nil
 }
 
 // CheckReceipt returns nil if receipt exists

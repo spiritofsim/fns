@@ -18,9 +18,18 @@ const (
 
 var testDate = time.Date(2020, 1, 15, 21, 10, 0, 0, time.UTC)
 
+func TestRegisterReturnsConflictOnExistingUser(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := Register(ctx, "name@domain.com", "name", os.Getenv("fns_phone"))
+	require.EqualError(t, err, "unexpected code 409")
+}
+
 func TestGetReceipt(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
+
 	receipt, err := GetReceipt(ctx, os.Getenv("fns_phone"), os.Getenv("fns_pass"), testFn, testFd, testFpd)
 	require.NoError(t, err)
 
