@@ -4,12 +4,18 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 )
+
+var UserAlreadyRegisteredErr = errors.New("user already registered")
+var BadPhoneErr = errors.New("bad phone")
+var BadEmailErr = errors.New("bad email")
 
 // Example: t=20200115T2110&s=1030.00&fn=9251440300046840&i=29414&fp=1250830908&n=1
 func ParseQrStr(str string) (fn string, opType, fd, fpd int, date time.Time, sum float32, err error) {
@@ -97,11 +103,27 @@ func Register(ctx context.Context, email, name, phone string) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("unexpected code %v", resp.StatusCode)
-	}
+	switch resp.StatusCode {
+	case http.StatusNoContent:
+		return nil
+	case http.StatusConflict:
+		return UserAlreadyRegisteredErr
+	default:
+		data, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
 
-	return nil
+		if strings.Index(string(data), "bad_email") > 0 {
+			return BadEmailErr
+		}
+
+		if strings.Index(string(data), "bad_phone") > 0 {
+			return BadPhoneErr
+		}
+
+		return fmt.Errorf("unexpected response %v:%v", resp.StatusCode, string(data))
+	}
 }
 
 // CheckReceipt returns nil if receipt exists

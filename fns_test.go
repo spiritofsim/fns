@@ -18,12 +18,33 @@ const (
 
 var testDate = time.Date(2020, 1, 15, 21, 10, 0, 0, time.UTC)
 
-func TestRegisterReturnsConflictOnExistingUser(t *testing.T) {
+func TestRegisterReturnsErrOnExistingUser(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	err := Register(ctx, "name@domain.com", "name", os.Getenv("fns_phone"))
-	require.EqualError(t, err, "unexpected code 409")
+	require.EqualError(t, err, UserAlreadyRegisteredErr.Error())
+}
+
+func TestRegisterReturnsErrOnBadPhone(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := Register(ctx, "name@domain.com", "name", "bad_phone")
+	require.EqualError(t, err, BadPhoneErr.Error())
+}
+
+func TestRegisterReturnsErrOnBadEmail(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := Register(ctx, "bad_email", "name", "+71231231212")
+	require.EqualError(t, err, BadEmailErr.Error())
+}
+
+func TestRegisterReturnsErrOnUnableToCreateReq(t *testing.T) {
+	err := Register(nil, "name@domain.com", "name", "+71231231212")
+	require.Error(t, err)
 }
 
 func TestGetReceipt(t *testing.T) {
