@@ -29,7 +29,7 @@ func TestGetReceipt(t *testing.T) {
 	require.Equal(t, float32(0), receipt.CounterSubmissionSum)
 	require.Equal(t, 1, receipt.TaxationType)
 	require.Equal(t, 3, receipt.Code)
-	require.Equal(t, os.Getenv("fns.fn"), receipt.FiscalDriveNumber)
+	require.Equal(t, testFn, receipt.FiscalDriveNumber)
 	require.Equal(t, 3, receipt.Code)
 	require.Equal(t, float32(171.66), receipt.Nds18)
 	require.Equal(t, testFpd, receipt.FiscalSign)
@@ -43,7 +43,7 @@ func TestGetReceipt(t *testing.T) {
 	require.Equal(t, 2, receipt.ProtocolVersion)
 	require.Equal(t, testDate, receipt.DateTime)
 	require.Equal(t, testSum, receipt.TotalSum)
-	require.Equal(t, os.Getenv("fns.inn"), receipt.UserInn)
+	require.Equal(t, "7728551528", receipt.UserInn)
 	require.Equal(t, float32(0), receipt.CashTotalSum)
 
 	require.Len(t, receipt.Items, 3)
