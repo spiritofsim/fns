@@ -15,6 +15,9 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Run Unit tests.
+        env:
+          fns_phone: ${{ secrets.fns_phone }}
+          fns_pass: ${{ secrets.fns_pass }}
         run: go test -coverprofile coverage.txt
 
       - name: Upload Coverage report to CodeCov
