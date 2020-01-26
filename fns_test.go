@@ -21,7 +21,7 @@ var testDate = time.Date(2020, 1, 15, 21, 10, 0, 0, time.UTC)
 func TestGetReceipt(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	receipt, err := GetReceipt(ctx, os.Getenv("fns.phone"), os.Getenv("fns.pass"), testFn, testFd, testFpd)
+	receipt, err := GetReceipt(ctx, os.Getenv("fns_phone"), os.Getenv("fns_pass"), testFn, testFd, testFpd)
 	require.NoError(t, err)
 
 	require.Equal(t, float32(0), receipt.PrepaymentSum)
@@ -57,7 +57,7 @@ func TestGetReceipt(t *testing.T) {
 }
 
 func TestGetReceiptReturnErrOnUnableToCreateReq(t *testing.T) {
-	_, err := GetReceipt(nil, os.Getenv("fns.phone"), os.Getenv("fns.pass"), testFn, testFd, testFpd)
+	_, err := GetReceipt(nil, os.Getenv("fns_phone"), os.Getenv("fns_pass"), testFn, testFd, testFpd)
 	require.EqualError(t, err, "net/http: nil Context")
 }
 
@@ -72,7 +72,7 @@ func TestGetReceiptReturnErrOnBadData(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := GetReceipt(ctx, os.Getenv("fns.phone"), os.Getenv("fns.pass"), "bad", testFd, testFpd)
+	_, err := GetReceipt(ctx, os.Getenv("fns_phone"), os.Getenv("fns_pass"), "bad", testFd, testFpd)
 	require.EqualError(t, err, "unexpected code 451")
 }
 
