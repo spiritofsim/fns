@@ -23,7 +23,6 @@ jobs:
           token: ${{secrets.CODECOV_TOKEN}}
           file: ./coverage.txt
 
-
   build:
     name: Build
     runs-on: ubuntu-latest
